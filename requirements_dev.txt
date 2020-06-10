@@ -1,0 +1,8 @@
+# Tools
+black
+Click==7.0
+isort
+pre-commit
+pylint
+pytest
+tox
