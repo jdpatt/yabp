@@ -3,8 +3,7 @@
 Yet Another Bus Pirate Libray
 
 A [Bus Pirate](http://dangerousprototypes.com/docs/Bus_Pirate) is a handy little debug tool.  Its
-firmware, command documentation and artwork are released into the public domain.  This is another library but fits my needs and doesn't carry the GPL notice that is tucked away in the *pyBusPirateLite*
-that is under the scripts folder or any derivative.  They have gone untouched and updated for many years.
+firmware, command documentation and artwork are released into the public domain.  This is another library built from the command documentation but fits my needs and doesn't carry the GPL notice that is tucked away in the *pyBusPirateLite* that is under the scripts folder or any similar derivatives.  They have gone untouched for many years.
 
 ## Developer Install
 
