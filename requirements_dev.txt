@@ -6,3 +6,6 @@ pre-commit
 pylint
 pytest
 tox
+
+# Dependencies
+pyserial

@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 def readme():
     """Open up the readme and use the text for the long description."""
     with open("README.md") as f:
@@ -13,23 +14,13 @@ setup(
     long_description=readme(),
     author="David Patterson",
     url="https://github.com/jdpatt/yabp",
-    entry_points={
-        'console_scripts': [
-            'yabp=yabp.cli:main',
-        ],
-    },
-    packages=[
-        "yabp",
-    ],
+    entry_points={"console_scripts": ["yabp=yabp.cli:main",],},
+    packages=["yabp",],
     package_dir={"yabp": "yabp"},
     include_package_data=True,
-    install_requires=[
-    ],
+    install_requires=["pyserial"],
     license="MIT",
     zip_safe=False,
     keywords="yabp",
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-    ],
+    classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 3.7",],
 )
