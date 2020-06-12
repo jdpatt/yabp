@@ -1,33 +1,45 @@
-"""Yet Another Bus Pirate Libray"""
+"""Yet Another Bus Pirate Libray."""
 import logging
+from typing import Union
 
 import serial
+import serial.tools.list_ports
+from yabp.exceptions import CommandError
+from yabp.modes import I2C, MODES
 
 log = logging.getLogger("Bus Pirate")
 
 
-class CommandException(Exception):
-    pass
-
-
 class BusPirate:
-    def __init__(self, port: str, baud_rate: int = 115200, timeout: float = 0.1):
-        # Configuration
-        self.port = port
-        self.baud_rate = baud_rate
-        self.timeout = timeout
+    """Parent class for all bus pirate modes."""
 
-        self._serial: serial.Serial = self.connect()
-        self.reset()
+    _BASE_COMMANDS = {
+        MODES.BASE.value: {"name": b"BBIO1", "command": b"\x00"},
+        MODES.SPI.value: {"name": b"SPI1", "command": b"\x01"},
+        MODES.I2C.value: {"name": b"I2C1", "command": b"\x02"},
+        MODES.UART.value: {"name": b"ART1", "command": b"\x03"},
+        MODES.ONE_WIRE.value: {"name": b"1W01", "command": b"\x04"},
+        MODES.RAW_WIRE.value: {"name": b"RAW1", "command": b"\x05"},
+    }
 
-    def __enter__(self) -> None:
-        """Allows using the bus pirate as a context manager.
+    def __init__(
+        self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
+    ):
+
+        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
+        self.current_mode = MODES.BASE
+
+        # Initalize Mode Classes
+        self.i2c = I2C(self)
+
+    def __enter__(self) -> "BusPirate":
+        """Allow using the bus pirate as a context manager.
 
         Example:
-
+        -------
         ```python
         with BusPirate("COM3") as bp:
-            bp.current_mode()
+            bp.is_alive()
         ```
 
         """
@@ -35,32 +47,65 @@ class BusPirate:
 
     def __exit__(self, *args):
         """Clean up from using the bus pirate as a context manager."""
-        self._serial.close()
+        self.close()
 
-    def connect(self) -> None:
-        """Open the serial port."""
-        try:
-            ser = serial.Serial(port=self.port, baudrate=self.baud_rate, timeout=self.timeout)
-            log.info(f"Connected to Bus Pirate on {self.port}")
-            return ser
-        except serial.serialutil.SerialException:
-            log.error("Failed to connect to Bus Pirate.")
-            raise
-
-    def reset(self) -> None:
-        """Reset and enter the scripting "bit bang" mode.
+    def open(self, port, baud_rate, timeout) -> serial.Serial:
+        """Open the serial port and enter the scripting mode.
 
         Send 0x00 to the user terminal (max.) 20 times to enter the raw binary bitbang mode.
         The bp will response with BBIO1 when it succeedes.
         """
+        try:
+            if not port:
+                port = get_serial_port()
+            serial_port = serial.Serial(port=port, baudrate=baud_rate, timeout=timeout)
+            log.info(f"Connected to Bus Pirate on {port}")
+        except serial.serialutil.SerialException:
+            log.error("Failed to connect to Bus Pirate.")
+            raise
+
+        serial_port.reset_input_buffer()
         for _ in range(0, 20):
-            self._serial.write(bytes([0x00]))
-            status = self._serial.read(5)
+            serial_port.write(bytes([0x00]))
+            status = serial_port.read(5)
             if b"BBIO" in status:
-                log.info(f"Mode: {status.decode()}")
-                self._serial.reset_input_buffer()
-                return
-        raise CommandException("Failed to Reset Bus Pirate.")
+                serial_port.reset_input_buffer()
+                return serial_port
+        raise CommandError("Failed to Reset Bus Pirate.")
+
+    def close(self) -> None:
+        """Free the serial port."""
+        self.serial.close()
+
+    def is_alive(self) -> bool:
+        """Return the serial port."""
+        return self.serial.is_open
+
+    def is_success(self) -> bool:
+        r"""Whenever the bus pirate succesfully completes a command, it returns b"\x01"."""
+        status = self.serial.read(1)
+        if status == b"\x01":
+            return True
+        return False
+
+    def set_mode(self, mode: MODES, log_change=True):
+        """Change the mode of the bus pirate."""
+        new_mode = self._BASE_COMMANDS[mode.value]
+        self.serial.reset_input_buffer()
+        self.serial.write(new_mode["command"])
+        name = self.serial.read(len(new_mode["name"]))
+        if new_mode["name"] == name:
+            if log_change:
+                log.info(f"Entered {mode.name} Mode.")
+            self.current_mode = mode
+            self.serial.reset_input_buffer()
+            return
+        else:
+            CommandError("Failed to change modes.")
+
+    def exit_mode(self) -> None:
+        """Leave the current mode and return to BBIO."""
+        self.set_mode(MODES.BASE, log_change=False)
 
     def exit(self) -> None:
         """Reset the Bus Pirate to the normal terminal interface.
@@ -68,21 +113,16 @@ class BusPirate:
         Send 0x0F to exit raw bitbang mode and reset the Bus Pirate.  The bp will response 0x01 on
         success.
         """
-        self._serial.write(bytes([0x0F]))
-        if self.is_success(self._serial.read(1)):
+        self.serial.write(bytes([0x0F]))
+        if self.is_success():
             log.info("Exited Scripting Mode.")
-
-    def is_success(self, status):
-        """Whenever the bus pirate succesfully completes a command, it returns b"\x01"."""
-        if status == b"\x01":
-            return True
+        self.serial.reset_input_buffer()
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger()
-    # bp = BusPirate("/dev/tty.usbserial-A901LM8T")
-    # bp.exit()
-
-    with BusPirate("/dev/tty.usbserial-A901LM8T") as bp:
-        bp.exit()
+def get_serial_port() -> str:
+    """Find an USB to Serial comport."""
+    potential_ports = serial.tools.list_ports.comports(include_links=True)
+    for port in potential_ports:
+        if "usbserial" in port.device:
+            return port.device
+    raise ConnectionError("Failed to find Bus Pirate")

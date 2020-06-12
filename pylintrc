@@ -5,6 +5,9 @@
 # run arbitrary code.
 extension-pkg-whitelist=
 
+# Specify a score threshold to be exceeded before program exits with error.
+fail-under=9
+
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
 ignore=CVS
@@ -32,9 +35,6 @@ load-plugins=
 
 # Pickle collected data for later comparisons.
 persistent=yes
-
-# Specify a configuration file.
-#rcfile=
 
 # When enabled, pylint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
@@ -138,10 +138,7 @@ disable=print-statement,
         xreadlines-attribute,
         deprecated-sys-function,
         exception-escape,
-        comprehension-escape,
-        duplicate-code,
-        wrong-import-order,
-        W0221
+        comprehension-escape
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -189,9 +186,9 @@ never-returning-functions=sys.exit
 
 [LOGGING]
 
-# Format style used to check logging format string. `old` means using %
-# formatting, `new` is for `{}` formatting,and `fstr` is for f-strings.
-logging-format-style=fstr
+# The type of string formatting that logging methods do. `old` means using %
+# formatting, `new` is for `{}` formatting.
+logging-format-style=new
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.
@@ -224,6 +221,9 @@ spelling-store-unknown-words=no
 notes=FIXME,
       XXX,
       TODO
+
+# Regular expression of note tags to take in consideration.
+#notes-rgx=
 
 
 [TYPECHECK]
@@ -387,6 +387,10 @@ bad-names=foo,
           tutu,
           tata
 
+# Bad variable names regexes, separated by a comma. If names match any regex,
+# they will always be refused
+bad-names-rgxs=
+
 # Naming style matching correct class attribute names.
 class-attribute-naming-style=any
 
@@ -426,6 +430,10 @@ good-names=i,
            ex,
            Run,
            _
+
+# Good variable names regexes, separated by a comma. If names match any regex,
+# they will always be accepted
+good-names-rgxs=
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
@@ -474,9 +482,12 @@ variable-naming-style=snake_case
 
 [STRING]
 
-# This flag controls whether the implicit-str-concat-in-sequence should
-# generate a warning on implicit string concatenation in sequences defined over
-# several lines.
+# This flag controls whether inconsistent-quotes generates a warning when the
+# character used as a quote delimiter is used inconsistently within a module.
+check-quote-consistency=no
+
+# This flag controls whether the implicit-str-concat should generate a warning
+# on implicit string concatenation in sequences defined over several lines.
 check-str-concat-over-line-jumps=no
 
 

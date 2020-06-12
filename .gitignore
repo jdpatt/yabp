@@ -11,3 +11,6 @@ pip-wheel-metadata
 .pytest_cache
 .venv
 .vscode
+htmlcov
+
+docs/build
