@@ -22,4 +22,4 @@ jobs:
         pip install tox tox-gh-actions
     - name: Tox
       run: |
-        tox
+        tox -e pylint,bandit,flake8,mypy,pydocstyle -p all

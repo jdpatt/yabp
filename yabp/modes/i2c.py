@@ -122,7 +122,7 @@ class I2C(AbstractMode):
         elif isinstance(data, list):
             # Send multiple bytes
             for byte_of_data in data:
-                self.sent(data)
+                self.send(data)
                 self.check_ack()
         self.stop()
 

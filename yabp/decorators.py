@@ -1,3 +1,4 @@
+"""Decorators used in yabp."""
 import functools
 
 
