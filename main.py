@@ -21,3 +21,6 @@ if __name__ == "__main__":
     bp.i2c.power(False)
     bp.i2c.pullups(False)
     bp.i2c.set_speed(3)
+    bp.uart.set_speed(4)
+    bp.uart.enable_rx(True)
+    bp.reset()

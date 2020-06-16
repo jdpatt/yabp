@@ -9,5 +9,5 @@ class MODES(Enum):
     SPI = 2
     I2C = 3
     UART = 4
-    ONE_WIRE = 5
-    RAW_WIRE = 6
+    # ONE_WIRE = 5
+    # RAW_WIRE = 6

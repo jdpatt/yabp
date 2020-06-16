@@ -9,4 +9,4 @@ __version__ = "0.1.0"
 __all__ = ["MODES", "BusPirate"]
 
 
-logging.getLogger("Bus Pirate").addHandler(logging.NullHandler())
+logging.getLogger("yabp").addHandler(logging.NullHandler())
