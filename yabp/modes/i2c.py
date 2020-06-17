@@ -94,6 +94,7 @@ class I2C(AbstractMode):
         response += self.read_byte()
         self.nack()
         self.stop()
+        return response.decode()
 
     @check_bp_mode
     def write_register(self, address: int, register: int, data: int):
@@ -119,6 +120,7 @@ class I2C(AbstractMode):
         self.send(register)
         self.start()
         self.send(address << 1 | 0x01)
-        self.read_byte()
+        response = self.read_byte()
         self.nack()
         self.stop()
+        return response.decode()

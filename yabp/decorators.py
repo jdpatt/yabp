@@ -14,7 +14,7 @@ def check_bp_mode(func):
     return wrapper_decorator
 
 
-def check_mode(func):
+def requires_base_mode(func):
     """Verify the bus pirate is in the base mode."""
 
     @functools.wraps(func)

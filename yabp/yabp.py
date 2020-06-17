@@ -5,7 +5,7 @@ from typing import Union
 
 import serial
 import serial.tools.list_ports
-from yabp.decorators import check_mode
+from yabp.decorators import requires_base_mode
 from yabp.exceptions import CommandError
 from yabp.modes import I2C, MODES, SPI, UART
 
@@ -97,12 +97,11 @@ class BusPirate:
         """Return the serial port."""
         return self.serial.is_open
 
-    def is_successful(self) -> bool:
+    def is_successful(self) -> None:
         r"""Whenever the bus pirate succesfully completes a command, it returns b"\x01"."""
         status = self.serial.read(1)
-        if status == b"\x01":
-            return True
-        return False
+        if status != b"\x01":
+            raise CommandError("Bus Pirate did not acknowledge command.")
 
     def set_mode(self, mode: MODES):
         """Change the mode of the bus pirate."""
@@ -135,7 +134,7 @@ class BusPirate:
             else:
                 CommandError("Failed to exit mode.")
 
-    @check_mode
+    @requires_base_mode
     def reset(self) -> None:
         """Reset the Bus Pirate to the normal terminal interface.
 
