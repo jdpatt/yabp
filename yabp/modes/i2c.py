@@ -87,7 +87,7 @@ class I2C(AbstractMode):
         """
         self.start()
         self.send(address << 1 | 0x01)
-        response = ""
+        response = b""
         for _ in range(0, number_of_bytes - 1):
             response += self.read_byte()
             self.ack()

@@ -142,8 +142,7 @@ class BusPirate:
         success.
         """
         self.serial.write(bytes([0x0F]))
-        if self.is_successful():
-            log.info("Exited Scripting Mode.")
+        self.is_successful()
         self.serial.reset_input_buffer()
 
 
