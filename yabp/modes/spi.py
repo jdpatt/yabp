@@ -19,7 +19,7 @@ class SPI(AbstractMode):
         self._config_spi = 0x82
 
     @check_bp_mode
-    def set_speed(self, speed: int = 0):
+    def set_speed(self, speed: int = 0) -> None:
         """Set the clock rate for SPI.
 
         Valid Settings:
@@ -38,7 +38,7 @@ class SPI(AbstractMode):
         self.is_successful()
 
     @check_bp_mode
-    def output_state(self, high=False):
+    def output_state(self, high: bool = False) -> None:
         """Set the pin output to HiZ or 3.3V."""
         if high:
             self._config_spi |= 0x08
@@ -49,7 +49,7 @@ class SPI(AbstractMode):
         self._write_config()
 
     @check_bp_mode
-    def set_chip_select(self, high=True):
+    def set_chip_select(self, high: bool = True) -> None:
         """Set the chip select pin either high (True) or low (False)."""
         if high:
             self.serial.write(bytes([0x03]))
@@ -60,7 +60,7 @@ class SPI(AbstractMode):
         self.is_successful()
 
     @check_bp_mode
-    def clock_idle_polarity(self, idle_low=True):
+    def clock_idle_polarity(self, idle_low: bool = True) -> None:
         """Update the clock to idle high or low."""
         if idle_low:
             self._config_spi |= 0x04
@@ -71,7 +71,7 @@ class SPI(AbstractMode):
         self._write_config()
 
     @check_bp_mode
-    def clock_edge_select(self, active_to_idle=True):
+    def clock_edge_select(self, active_to_idle: bool = True) -> None:
         """Update the clock to idle high or low."""
         if active_to_idle:
             self._config_spi |= 0x02
@@ -82,7 +82,7 @@ class SPI(AbstractMode):
         self._write_config()
 
     @check_bp_mode
-    def sample_time(self, end=False):
+    def sample_time(self, end: bool = False) -> None:
         """Update the clock to idle high or low."""
         if end:
             self._config_spi |= 0x01
@@ -92,12 +92,12 @@ class SPI(AbstractMode):
             log.info("Sample Data at Middle of Pulse.")
         self._write_config()
 
-    def _write_config(self):
+    def _write_config(self) -> None:
         """Update the configuration register."""
         self.serial.write(bytes([self._config_spi]))
         self.is_successful()
 
     @property
-    def config_spi(self):
+    def config_spi(self) -> int:
         """Return the current configuration of the SPI register."""
         return self._config_spi

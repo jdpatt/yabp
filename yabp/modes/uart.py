@@ -17,7 +17,7 @@ class UART(AbstractMode):
         self._config_uart = 0x80  # HiZ, 8/N, 1 STOP, IDLE HIGH
 
     @check_bp_mode
-    def enable_rx(self, enabled=False):
+    def enable_rx(self, enabled: bool = False):
         """Enable passing RX data to the USB port."""
         if enabled:
             self.serial.write(bytes([0x03]))
@@ -58,7 +58,7 @@ class UART(AbstractMode):
         self.is_successful()
 
     @check_bp_mode
-    def output_state(self, high=False):
+    def output_state(self, high: bool = False):
         """Set the pin output to HiZ or 3.3V."""
         if high:
             self._config_uart |= 0x10
@@ -69,7 +69,7 @@ class UART(AbstractMode):
         self._write_config()
 
     @check_bp_mode
-    def data_bits_and_parity(self, setting=0):
+    def data_bits_and_parity(self, setting: int = 0):
         """Configure how many data bits and the parity of the UART.
 
         Valid Settings:
@@ -84,7 +84,7 @@ class UART(AbstractMode):
         self._write_config()
 
     @check_bp_mode
-    def stop_bits(self, number):
+    def stop_bits(self, number: int):
         """Configure the number of stop bits."""
         if number == 0:
             self._config_uart |= 0x02
@@ -97,7 +97,7 @@ class UART(AbstractMode):
         self._write_config()
 
     @check_bp_mode
-    def idle_polarity(self, idle_high=True):
+    def idle_polarity(self, idle_high: bool = True):
         """Update the bus to idle high or low."""
         if idle_high:
             self._config_uart |= 0x01
@@ -107,12 +107,12 @@ class UART(AbstractMode):
             log.info("Idle Low")
         self._write_config()
 
-    def _write_config(self):
+    def _write_config(self) -> None:
         """Update the configuration register."""
         self.serial.write(bytes([self._config_uart]))
         self.is_successful()
 
     @property
-    def config_uart(self):
+    def config_uart(self) -> int:
         """Return the current configuration of the UART register."""
         return self._config_uart

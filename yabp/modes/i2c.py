@@ -17,31 +17,31 @@ class I2C(AbstractMode):
         self.required_mode = MODES.I2C
 
     @check_bp_mode
-    def start(self):
+    def start(self) -> None:
         """Send a start bit."""
         self.serial.write(bytes([0x02]))
         self.is_successful()
 
     @check_bp_mode
-    def stop(self):
+    def stop(self) -> None:
         """Send a start bit."""
         self.serial.write(bytes([0x03]))
         self.is_successful()
 
     @check_bp_mode
-    def ack(self):
+    def ack(self) -> None:
         """Acknowledge a byte."""
         self.serial.write(bytes([0x06]))
         self.is_successful()
 
     @check_bp_mode
-    def nack(self):
+    def nack(self) -> None:
         """No Acknowledge a byte."""
         self.serial.write(bytes([0x07]))
         self.is_successful()
 
     @check_bp_mode
-    def read_byte(self):
+    def read_byte(self) -> bytes:
         """Read and returns a single byte.
 
         You must call ack() or nack() afterwards.
@@ -50,7 +50,7 @@ class I2C(AbstractMode):
         return self.serial.read(1)
 
     @check_bp_mode
-    def set_speed(self, speed: int = 2):
+    def set_speed(self, speed: int = 2) -> None:
         """Set the I2C Bus rate.
 
         Valid Settings: 0: 5kHz, 1: 50kHz, 2: 100Khz, 3: 400kHz
@@ -61,7 +61,7 @@ class I2C(AbstractMode):
         self.is_successful()
 
     @check_bp_mode
-    def write(self, address: int, data: Union[int, List]):
+    def write(self, address: int, data: Union[int, List]) -> None:
         """Write to an I2C device.
 
         This takes the 7 bit address and appends a zero (write bit) to the address.  It then
@@ -75,11 +75,11 @@ class I2C(AbstractMode):
         elif isinstance(data, list):
             # Send multiple bytes
             for byte_of_data in data:
-                self.send(data)
+                self.send(byte_of_data)
         self.stop()
 
     @check_bp_mode
-    def read(self, address: int, number_of_bytes: int):
+    def read(self, address: int, number_of_bytes: int) -> str:
         """Read from an I2C device.
 
         This takes the 7 bit address and appends a 1 (read bit) to the address.  It then
@@ -97,7 +97,7 @@ class I2C(AbstractMode):
         return response.decode()
 
     @check_bp_mode
-    def write_register(self, address: int, register: int, data: int):
+    def write_register(self, address: int, register: int, data: int) -> None:
         """Write to an I2C device's register.
 
         This takes the 7 bit address and appends a zero (write bit) to the address.  It then
@@ -110,7 +110,7 @@ class I2C(AbstractMode):
         self.stop()
 
     @check_bp_mode
-    def read_register(self, address: int, register: int):
+    def read_register(self, address: int, register: int) -> str:
         """Read from an I2C device's register.
 
         This takes the 7 bit address and appends a 1 (read bit) to the address.
