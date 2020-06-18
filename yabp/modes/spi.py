@@ -34,8 +34,7 @@ class SPI(AbstractMode):
         """
         if speed < 1 or speed > 10 or speed == 9:
             raise ValueError(f"{speed} is not a valid baud rate setting.")
-        self.serial.write(bytes([0x60 | speed]))
-        self.is_successful()
+        self.command(bytes([0x60 | speed]))
 
     @check_bp_mode
     def output_state(self, high: bool = False) -> None:
@@ -94,8 +93,7 @@ class SPI(AbstractMode):
 
     def _write_config(self) -> None:
         """Update the configuration register."""
-        self.serial.write(bytes([self._config_spi]))
-        self.is_successful()
+        self.command(bytes([self._config_spi]))
 
     @property
     def config_spi(self) -> int:

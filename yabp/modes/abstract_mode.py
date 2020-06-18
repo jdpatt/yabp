@@ -28,6 +28,11 @@ class AbstractMode(ABC):
         """Write whatever is in data to the serial port."""
         self.serial.write(bytes([data]))
 
+    def command(self, command: int):
+        """Write the command to the bus pirate and make sure the command succeeded."""
+        self.serial.write(command)
+        self.is_successful()
+
     def is_successful(self) -> None:
         r"""Whenever the bus pirate succesfully completes a command, it returns b"\x01"."""
         status = self.serial.read(1)
@@ -58,8 +63,7 @@ class AbstractMode(ABC):
 
     def _write_config(self) -> None:
         """Update the configuration register."""
-        self.serial.write(bytes([self._config_peripherals]))
-        self.is_successful()
+        self.command(bytes([self._config_peripherals]))
 
     @property
     def config_peripherals(self) -> int:

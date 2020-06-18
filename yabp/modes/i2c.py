@@ -19,26 +19,22 @@ class I2C(AbstractMode):
     @check_bp_mode
     def start(self) -> None:
         """Send a start bit."""
-        self.serial.write(bytes([0x02]))
-        self.is_successful()
+        self.command(bytes([0x02]))
 
     @check_bp_mode
     def stop(self) -> None:
         """Send a start bit."""
-        self.serial.write(bytes([0x03]))
-        self.is_successful()
+        self.command(bytes([0x03]))
 
     @check_bp_mode
     def ack(self) -> None:
         """Acknowledge a byte."""
-        self.serial.write(bytes([0x06]))
-        self.is_successful()
+        self.command(bytes([0x06]))
 
     @check_bp_mode
     def nack(self) -> None:
         """No Acknowledge a byte."""
-        self.serial.write(bytes([0x07]))
-        self.is_successful()
+        self.command(bytes([0x07]))
 
     @check_bp_mode
     def read_byte(self) -> bytes:
@@ -57,8 +53,7 @@ class I2C(AbstractMode):
         """
         if speed < 1 or speed > 3:
             raise ValueError(f"{speed} is not a valid i2c speed setting.")
-        self.serial.write(bytes([0x60 | speed]))
-        self.is_successful()
+        self.command(bytes([0x60 | speed]))
 
     @check_bp_mode
     def write(self, address: int, data: Union[int, List]) -> None:

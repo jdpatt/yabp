@@ -93,6 +93,11 @@ class BusPirate:
         """Free the serial port."""
         self.serial.close()
 
+    def command(self, command: int):
+        """Write the command to the bus pirate and make sure the command succeeded."""
+        self.serial.write(command)
+        self.is_successful()
+
     def is_alive(self) -> bool:
         """Return the serial port."""
         return self.serial.is_open
@@ -141,8 +146,7 @@ class BusPirate:
         Send 0x0F to exit raw bitbang mode and reset the Bus Pirate.  The bp will response 0x01 on
         success.
         """
-        self.serial.write(bytes([0x0F]))
-        self.is_successful()
+        self.command(bytes([0x0F]))
         self.serial.reset_input_buffer()
 
 

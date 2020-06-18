@@ -33,8 +33,7 @@ class UART(AbstractMode):
 
         The only way to reset or exit is to unplug the Bus Pirate.
         """
-        self.serial.write(bytes([0x0F]))
-        self.is_successful()
+        self.command(bytes([0x0F]))
 
     @check_bp_mode
     def set_speed(self, speed: int = 2):
@@ -54,8 +53,7 @@ class UART(AbstractMode):
         """
         if speed < 1 or speed > 10 or speed == 9:
             raise ValueError(f"{speed} is not a valid baud rate setting.")
-        self.serial.write(bytes([0x60 | speed]))
-        self.is_successful()
+        self.command(bytes([0x60 | speed]))
 
     @check_bp_mode
     def output_state(self, high: bool = False):
@@ -109,8 +107,7 @@ class UART(AbstractMode):
 
     def _write_config(self) -> None:
         """Update the configuration register."""
-        self.serial.write(bytes([self._config_uart]))
-        self.is_successful()
+        self.command(bytes([self._config_uart]))
 
     @property
     def config_uart(self) -> int:
