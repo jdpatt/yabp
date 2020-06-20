@@ -1,17 +1,14 @@
 import pytest
-import yabp
 
 
-@pytest.fixture
-def bus_pirate(scope="module"):
-    """Bus Pirate Fixture to share COM port across tests."""
-    try:
-        bp = yabp.BusPirate()
-    except ConnectionError:
-        pytest.skip("Test requires active bus pirate connection.")
-    return bp
-
-
-def test_basic_init(bus_pirate):
+def test_basic_init(bp_loop):
     """Verify that we can connect to a bus pirate."""
-    assert bus_pirate.is_alive()
+    assert bp_loop.is_alive()
+
+
+def test_command_and_read_byte(bp_loop):
+    """Write \x01 and see if the same value is returned.
+
+    If not it will raise CommandError.
+    """
+    bp_loop.command(b"\x01")

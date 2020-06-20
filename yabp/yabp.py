@@ -93,7 +93,7 @@ class BusPirate:
         """Free the serial port."""
         self.serial.close()
 
-    def command(self, command: int):
+    def command(self, command: bytes):
         """Write the command to the bus pirate and make sure the command succeeded."""
         self.serial.write(command)
         self.is_successful()
@@ -108,7 +108,7 @@ class BusPirate:
         if status != b"\x01":
             raise CommandError("Bus Pirate did not acknowledge command.")
 
-    def set_mode(self, mode: MODES):
+    def set_mode(self, mode: MODES) -> None:
         """Change the mode of the bus pirate."""
         if self.current_mode != mode:
             self.exit_mode()
@@ -120,7 +120,6 @@ class BusPirate:
                 log.info(f"Entered {mode.name} Mode.")
                 self.current_mode = mode
                 self.serial.reset_input_buffer()
-                return
             else:
                 CommandError("Failed to change modes.")
 
@@ -132,10 +131,8 @@ class BusPirate:
             self.serial.write(base_mode["command"])
             name = self.serial.read(len(base_mode["name"]))
             if base_mode["name"] == name:
-                log.info(f"Left {self.current_mode.name} Mode.")
                 self.current_mode = MODES.BASE
                 self.serial.reset_input_buffer()
-                return
             else:
                 CommandError("Failed to exit mode.")
 

@@ -28,7 +28,7 @@ class AbstractMode(ABC):
         """Write whatever is in data to the serial port."""
         self.serial.write(bytes([data]))
 
-    def command(self, command: int):
+    def command(self, command: bytes):
         """Write the command to the bus pirate and make sure the command succeeded."""
         self.serial.write(command)
         self.is_successful()
