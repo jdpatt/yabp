@@ -3,7 +3,7 @@
 Yet Another Bus Pirate Libray
 
 A [Bus Pirate](http://dangerousprototypes.com/docs/Bus_Pirate) is a handy little debug tool.  Its
-firmware, command documentation and artwork are released into the public domain.  This is another library built from the command documentation but fits my needs and doesn't carry the GPL notice that is tucked away in the *pyBusPirateLite* that is under the scripts folder or any similar derivatives.  They have gone untouched for many years.
+firmware, command documentation and artwork are released into the public domain.  The python libraries that I could find have a GPL notice that is tucked away in the `__init__.py`. They have also gone untouched for many years. This is another library built from the command documentation but with a MIT license.
 
 This library only exposes one class `BusPirate` and an enum `MODES`.  `BusPirate` can be used for all modes and will automatically change modes as needed.  You can also explicity set the mode with `bp.set_mode(MODES.MODE_I_WANT_TO_USE)`.
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # Traditional usage:
     try:
-        bp = yabp.BusPirate()
+        bp = yabp.BusPirate("COM3", 115200)
         bp.i2c.write_register(0x23, 0x01, 0xFF)
         bp.close()
     except ConnectionError as error:
