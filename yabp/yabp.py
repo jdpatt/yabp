@@ -6,8 +6,9 @@ from typing import Union
 import serial
 import serial.tools.list_ports
 from yabp.decorators import requires_base_mode
+from yabp.enums import MODES
 from yabp.exceptions import CommandError
-from yabp.modes import I2C, MODES, SPI, UART
+from yabp.modes import I2C, SPI, UART
 
 log = logging.getLogger("yabp")
 
@@ -106,7 +107,7 @@ class BusPirate:
         r"""Whenever the bus pirate succesfully completes a command, it returns b"\x01"."""
         status = self.serial.read(1)
         if status != b"\x01":
-            raise CommandError("Bus Pirate did not acknowledge command.")
+            raise CommandError(f"Bus Pirate did not acknowledge command. Returned: {status}")
 
     def set_mode(self, mode: MODES) -> None:
         """Change the mode of the bus pirate."""
@@ -145,6 +146,41 @@ class BusPirate:
         """
         self.command(bytes([0x0F]))
         self.serial.reset_input_buffer()
+
+    @requires_base_mode
+    def disable_pwm(self) -> None:
+        """Clear and Disable the pwm configuration."""
+        self.command(bytes([0x13]))
+
+    @requires_base_mode
+    def configure_pwm(self, period: int, duty_cycle: float, prescaler: int = 0) -> None:
+        """Configure the PWM on the bus pirate's AUX pin.
+
+        Args:
+        ----
+            period: pwm period in miliseconds (1e-3 == 0.1msec)
+            duty_cycle: 0 to 1 (.5 == 50% Duty Cycle)
+            prescaler: 0: x1, 1: x8, 2: x64, 3: x256
+        """
+        crystal_frequency = 32_000_000  # 32 MHz
+
+        system_clock = 2.0 / crystal_frequency
+        period_register = period / (system_clock * prescaler)
+        period_register = period_register - 1
+        output_compare_register = period_register * duty_cycle
+
+        self.command(
+            bytes(
+                [
+                    0x12,  # Setup PWM Command
+                    prescaler,  # Config Byte 1
+                    ((int(output_compare_register) >> 8) & 0xFF),  # Config Byte 2
+                    (int(output_compare_register) & 0xFF),  # Config Byte 3
+                    ((int(period_register) >> 8) & 0xFF),  # Config Byte 4
+                    (int(period_register) & 0xFF),  # Config Byte 5
+                ]
+            )
+        )
 
 
 def get_serial_port() -> str:

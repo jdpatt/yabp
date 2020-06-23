@@ -2,8 +2,8 @@
 import logging
 
 from yabp.decorators import check_bp_mode
+from yabp.enums import MODES
 from yabp.modes.abstract_mode import AbstractMode
-from yabp.modes.modes import MODES
 
 log = logging.getLogger("yabp")
 

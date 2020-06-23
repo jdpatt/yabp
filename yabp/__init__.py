@@ -1,7 +1,7 @@
 """Yet Another Bus Pirate Libray."""
 import logging
 
-from .modes import MODES
+from .enums import MODES
 from .yabp import BusPirate
 
 __author__ = "David Patterson"

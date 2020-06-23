@@ -37,7 +37,7 @@ class AbstractMode(ABC):
         r"""Whenever the bus pirate succesfully completes a command, it returns b"\x01"."""
         status = self.serial.read(1)
         if status != b"\x01":
-            raise CommandError("Bus Pirate did not acknowledge command.")
+            raise CommandError(f"Bus Pirate did not acknowledge command. Returned: {status}")
 
     @check_bp_mode
     def pullups(self, enable=False) -> None:
@@ -59,6 +59,28 @@ class AbstractMode(ABC):
         else:
             self._config_peripherals &= ~0x04
             log.info("Disabled Power Supplies")
+        self._write_config()
+
+    @check_bp_mode
+    def set_aux_pin(self, high=True) -> None:
+        """Enable or Disable the on board power supplies."""
+        if high:
+            self._config_peripherals |= 0x02
+            log.info("Set Aux Pin High (3.3V)")
+        else:
+            self._config_peripherals &= ~0x02
+            log.info("Set Aux Pin Low (0V)")
+        self._write_config()
+
+    @check_bp_mode
+    def set_cs_pin(self, high=True) -> None:
+        """Enable or Disable the on board power supplies."""
+        if high:
+            self._config_peripherals |= 0x01
+            log.info("Set CS Pin High (3.3V)")
+        else:
+            self._config_peripherals &= ~0x01
+            log.info("Set CS Pin Low (0V)")
         self._write_config()
 
     def _write_config(self) -> None:

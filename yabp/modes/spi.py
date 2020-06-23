@@ -2,8 +2,8 @@
 import logging
 
 from yabp.decorators import check_bp_mode
+from yabp.enums import MODES
 from yabp.modes.abstract_mode import AbstractMode
-from yabp.modes.modes import MODES
 
 log = logging.getLogger("yabp")
 
@@ -32,7 +32,7 @@ class SPI(AbstractMode):
             6: 4MHz
             7: 8MHz
         """
-        if speed < 1 or speed > 10 or speed == 9:
+        if speed < 0 or speed > 7:
             raise ValueError(f"{speed} is not a valid baud rate setting.")
         self.command(bytes([0x60 | speed]))
 

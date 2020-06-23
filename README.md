@@ -51,3 +51,11 @@ if __name__ == "__main__":
     with yabp.BusPirate() as bp:
         bp.i2c.write_register(0x23, 0x01, 0xFF)
 ```
+
+## I2C Commands
+
+- `bp.i2c.set_speed(speed: int)`
+- `bp.i2c.write(address: int, data: Union[int, List])`
+- `bp.i2c.read(address: int, number_of_bytes: int)`
+- `bp.i2c.write_register(address: int, register: int, data: int)`
+- `bp.i2c.read_register(address: int, register: int)`
