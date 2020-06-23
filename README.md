@@ -1,6 +1,9 @@
 # yabp
 
-Yet Another Bus Pirate Libray
+Yet Another Bus Pirate Library
+
+![yabp](https://github.com/jdpatt/yabp/workflows/yabp/badge.svg)
+
 
 A [Bus Pirate](http://dangerousprototypes.com/docs/Bus_Pirate) is a handy little debug tool.  Its
 firmware, command documentation and artwork are released into the public domain.  The python libraries that I could find have a GPL notice that is tucked away in the `__init__.py`. They have also gone untouched for many years. This is another library built from the command documentation but with a MIT license.
