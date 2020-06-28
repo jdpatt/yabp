@@ -19,22 +19,22 @@ class I2C(AbstractMode):
     @check_bp_mode
     def start(self) -> None:
         """Send a start bit."""
-        self.command(bytes([0x02]))
+        self.command(b"\x02")
 
     @check_bp_mode
     def stop(self) -> None:
         """Send a start bit."""
-        self.command(bytes([0x03]))
+        self.command(b"\x03")
 
     @check_bp_mode
     def ack(self) -> None:
         """Acknowledge a byte."""
-        self.command(bytes([0x06]))
+        self.command(b"\x06")
 
     @check_bp_mode
     def nack(self) -> None:
         """No Acknowledge a byte."""
-        self.command(bytes([0x07]))
+        self.command(b"\x07")
 
     @check_bp_mode
     def read_byte(self) -> bytes:
@@ -42,7 +42,7 @@ class I2C(AbstractMode):
 
         You must call ack() or nack() afterwards.
         """
-        self.serial.write(bytes([0x04]))
+        self.serial.write(b"\x04")
         return self.serial.read(1)
 
     @check_bp_mode

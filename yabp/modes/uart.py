@@ -20,10 +20,10 @@ class UART(AbstractMode):
     def enable_rx(self, enabled: bool = False):
         """Enable passing RX data to the USB port."""
         if enabled:
-            self.serial.write(bytes([0x03]))
+            self.serial.write(b"\x03")
             log.info("Enabling UART RX")
         else:
-            self.serial.write(bytes([0x02]))
+            self.serial.write(b"\x02")
             log.info("Disabling UART RX")
         self.is_successful()
 
@@ -33,7 +33,7 @@ class UART(AbstractMode):
 
         The only way to reset or exit is to unplug the Bus Pirate.
         """
-        self.command(bytes([0x0F]))
+        self.command(b"\x0F")
 
     @check_bp_mode
     def set_speed(self, speed: int = 2):

@@ -83,7 +83,7 @@ class BusPirate:
 
         serial_port.reset_input_buffer()
         for _ in range(0, 20):
-            serial_port.write(bytes([0x00]))
+            serial_port.write(b"\x00")
             status = serial_port.read(5)
             if b"BBIO" in status:
                 serial_port.reset_input_buffer()
@@ -144,13 +144,13 @@ class BusPirate:
         Send 0x0F to exit raw bitbang mode and reset the Bus Pirate.  The bp will response 0x01 on
         success.
         """
-        self.command(bytes([0x0F]))
+        self.command(b"\x0f")
         self.serial.reset_input_buffer()
 
     @requires_base_mode
     def disable_pwm(self) -> None:
         """Clear and Disable the pwm configuration."""
-        self.command(bytes([0x13]))
+        self.command(b"\x13")
 
     @requires_base_mode
     def configure_pwm(self, period: int, duty_cycle: float, prescaler: int = 0) -> None:

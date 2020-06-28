@@ -51,10 +51,10 @@ class SPI(AbstractMode):
     def set_chip_select(self, high: bool = True) -> None:
         """Set the chip select pin either high (True) or low (False)."""
         if high:
-            self.serial.write(bytes([0x03]))
+            self.serial.write(b"\x03")
             log.info("Chip Select High.")
         else:
-            self.serial.write(bytes([0x02]))
+            self.serial.write(b"\x02")
             log.info("Chip Select Low.")
         self.is_successful()
 
