@@ -161,6 +161,7 @@ class BusPirate:
             period: pwm period in miliseconds (1e-3 == 0.1msec)
             duty_cycle: 0 to 1 (.5 == 50% Duty Cycle)
             prescaler: 0: x1, 1: x8, 2: x64, 3: x256
+
         """
         crystal_frequency = 32_000_000  # 32 MHz
 
