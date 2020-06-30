@@ -1,5 +1,5 @@
 import logging
-from enum import IntEnum
+from enum import Enum
 
 import yabp
 
@@ -16,16 +16,16 @@ class MCP23017:
         "GPIOB": 0x13,
     }
 
-    class DIRECTION(IntEnum):
+    class DIRECTION(Enum):
         OUTPUT = 0
         INPUT = 1
 
-    class LOGIC_LEVEL(IntEnum):
+    class LOGIC_LEVEL(Enum):
         LOW = 0
         HIGH = 1
 
-    PORTA_PINS = [{f"A{index}": index} for index in range(0, 8)]
-    PORTB_PINS = [{f"B{index}": index} for index in range(0, 8)]
+    PINS = [f"A{index}" for index in range(0, 8)]
+    PINS.extend([f"B{index}" for index in range(0, 8)])
 
     def __init__(self, seven_bit_address, bus_pirate):
         self.address = seven_bit_address
@@ -44,8 +44,18 @@ class MCP23017:
         The MCP23017 defaults to all pins being an input on POR.
         """
         log.debug(f"Setting {pin} to direction: {direction.name}")
-        if self._valid_pin(pin):
-            pass
+        if self._is_valid_pin(pin):
+            if pin[0] == "A":
+                register = "IODIRA"
+            else:
+                register = "IODIRB"
+
+            if direction == self.DIRECTION.INPUT:
+                self._set_bit(register, int(pin[1]))
+            else:
+                self._clear_bit(register, int(pin[1]))
+
+            self._write_register(register)
 
     def set_level(self, pin: str, logic_level: LOGIC_LEVEL):
         """Update the logic level of a given pin.
@@ -53,13 +63,32 @@ class MCP23017:
         The MCP23017 defaults to all pins being a logic low (0) on POR.
         """
         log.debug(f"Setting {pin} to logic level: {logic_level.name}")
-        if self._valid_pin(pin):
-            pass
+        if self._is_valid_pin(pin):
+            if pin[0] == "A":
+                register = "GPIOA"
+            else:
+                register = "GPIOB"
 
-    def _valid_pin(self, pin: str):
+            if logic_level == self.LOGIC_LEVEL.HIGH:
+                self._set_bit(register, int(pin[1]))
+            else:
+                self._clear_bit(register, int(pin[1]))
+
+            self._write_register(register)
+
+    def _is_valid_pin(self, pin: str):
         """Raise an exception if the pin is invalid."""
-        if pin not in self.PORTA_PINS or pin not in self.PORTB_PINS:
+        if pin not in self.PINS:
             raise ValueError(f"Invalid pin: {pin} for MCP23017.")
+        return True
+
+    def _set_bit(self, register, index):
+        """Set the index of the bit to 1."""
+        self.registers[register] |= 0x01 << index
+
+    def _clear_bit(self, register, index):
+        """Set the index of the bit to 1."""
+        self.registers[register] &= ~(0x01 << index)
 
     def _write_register(self, register: str):
         """Write out over I2C to the device."""
