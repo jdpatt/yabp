@@ -5,9 +5,9 @@ from enum import Enum
 class MODES(Enum):
     """Modes supported by yabp."""
 
-    BASE = 1
-    SPI = 2
-    I2C = 3
-    UART = 4
-    # ONE_WIRE = 5
-    # RAW_WIRE = 6
+    BASE = 0
+    SPI = 1
+    I2C = 2
+    UART = 3
+    # ONE_WIRE = 4
+    # RAW_WIRE = 5

@@ -1,4 +1,6 @@
+"""Bus Pirate Control of a Microchip GPIO Expander."""
 import logging
+import time
 from enum import Enum
 
 import yabp
@@ -17,10 +19,14 @@ class MCP23017:
     }
 
     class DIRECTION(Enum):
+        """The pin direction defintion of the MCP23017."""
+
         OUTPUT = 0
         INPUT = 1
 
     class LOGIC_LEVEL(Enum):
+        """The pin logic level defintion of the MCP23017."""
+
         LOW = 0
         HIGH = 1
 
@@ -38,12 +44,33 @@ class MCP23017:
             "GPIOB": 0x00,
         }
 
+    def set_all_direction(self, direction: DIRECTION):
+        """Update the direction of all pins."""
+        if direction == self.DIRECTION.INPUT:
+            value = 0xFF
+        else:
+            value = 0x00
+        for register in ["IODIRA", "IODIRB"]:
+            self.registers[register] = value
+            self._write_register(register)
+        log.debug(f"Setting all pins to direction: {direction.name}")
+
+    def set_all_logic_level(self, logic_level: LOGIC_LEVEL):
+        """Update the logic_level of all pins."""
+        if logic_level == self.LOGIC_LEVEL.HIGH:
+            value = 0xFF
+        else:
+            value = 0x00
+        for register in ["IODIRA", "IODIRB"]:
+            self.registers[register] = value
+            self._write_register(register)
+        log.debug(f"Setting all pins to logic level: {logic_level.name}")
+
     def set_direction(self, pin: str, direction: DIRECTION):
         """Update the direction of a given pin.
 
         The MCP23017 defaults to all pins being an input on POR.
         """
-        log.debug(f"Setting {pin} to direction: {direction.name}")
         if self._is_valid_pin(pin):
             if pin[0] == "A":
                 register = "IODIRA"
@@ -56,13 +83,13 @@ class MCP23017:
                 self._clear_bit(register, int(pin[1]))
 
             self._write_register(register)
+        log.debug(f"Setting {pin} to direction: {direction.name}")
 
     def set_level(self, pin: str, logic_level: LOGIC_LEVEL):
         """Update the logic level of a given pin.
 
         The MCP23017 defaults to all pins being a logic low (0) on POR.
         """
-        log.debug(f"Setting {pin} to logic level: {logic_level.name}")
         if self._is_valid_pin(pin):
             if pin[0] == "A":
                 register = "GPIOA"
@@ -75,6 +102,7 @@ class MCP23017:
                 self._clear_bit(register, int(pin[1]))
 
             self._write_register(register)
+        log.debug(f"Setting {pin} to logic level: {logic_level.name}")
 
     def _is_valid_pin(self, pin: str):
         """Raise an exception if the pin is invalid."""
@@ -93,19 +121,22 @@ class MCP23017:
     def _write_register(self, register: str):
         """Write out over I2C to the device."""
         self.i2c.write_register(
-            self.address, MCP23017_MEMORYMAP[register], self.registers[register]
+            self.address, self.MCP23017_MEMORYMAP[register], self.registers[register]
         )
 
     def _read_register(self, register: str):
         """Read register from the device."""
         self.registers[register] = self.i2c.read_register(
-            self.address, MCP23017_MEMORYMAP[register]
+            self.address, self.MCP23017_MEMORYMAP[register]
         )
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    with yabp.BusPirate() as bp:
+    with yabp.BusPirate("COM7") as bp:
         gpio_expander = MCP23017(0x20, bp)
-        gpio_expander.set_direction("A1", gpio_expander.DIRECTION.OUTPUT)
-        gpio_expander.set_level("A1", gpio_expander.LOGIC_LEVEL.HIGH)
+        gpio_expander.set_all_direction(gpio_expander.DIRECTION.OUTPUT)
+        time.sleep(2)
+        gpio_expander.set_level("A0", gpio_expander.LOGIC_LEVEL.HIGH)
+        time.sleep(2)
+        gpio_expander.set_level("A0", gpio_expander.LOGIC_LEVEL.LOW)

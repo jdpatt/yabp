@@ -1,6 +1,5 @@
 """Yet Another Bus Pirate Libray."""
 import logging
-from enum import IntFlag, auto
 from typing import Union
 
 import serial
@@ -11,18 +10,6 @@ from yabp.exceptions import CommandError
 from yabp.modes import I2C, SPI, UART
 
 log = logging.getLogger("yabp")
-
-
-class Pins(IntFlag):
-    """Each GPIO on the bus pirate that can be configured as an input or output."""
-
-    CS = auto()
-    MISO = auto()
-    CLK = auto()
-    MOSI = auto()
-    AUX = auto()
-    PULLUP = auto()
-    POWER = auto()
 
 
 class BusPirate:
@@ -70,7 +57,7 @@ class BusPirate:
         """Open the serial port and enter the scripting mode.
 
         Send 0x00 to the user terminal (max.) 20 times to enter the raw binary bitbang mode.
-        The bp will response with BBIO1 when it succeedes.
+        The bp will response with BBIO1 when it succeeds.
         """
         try:
             if not port:
@@ -116,8 +103,8 @@ class BusPirate:
             new_mode = self._MODE_COMMANDS[mode.value]
             self.serial.reset_input_buffer()
             self.serial.write(new_mode["command"])
-            name = self.serial.read(len(new_mode["name"]))
-            if new_mode["name"] == name:
+            returned_name = self.serial.read(len(new_mode["name"]))
+            if new_mode["name"] == returned_name:
                 log.info(f"Entered {mode.name} Mode.")
                 self.current_mode = mode
                 self.serial.reset_input_buffer()
@@ -130,8 +117,8 @@ class BusPirate:
             base_mode = self._MODE_COMMANDS[MODES.BASE.value]
             self.serial.reset_input_buffer()
             self.serial.write(base_mode["command"])
-            name = self.serial.read(len(base_mode["name"]))
-            if base_mode["name"] == name:
+            returned_name = self.serial.read(len(base_mode["name"]))
+            if base_mode["name"] == returned_name:
                 self.current_mode = MODES.BASE
                 self.serial.reset_input_buffer()
             else:

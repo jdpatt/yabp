@@ -64,13 +64,7 @@ class I2C(AbstractMode):
         """
         self.start()
         self.send(address << 1)
-        if isinstance(data, int):
-            # Send a single byte
-            self.send(data)
-        elif isinstance(data, list):
-            # Send multiple bytes
-            for byte_of_data in data:
-                self.send(byte_of_data)
+        self.send(data)
         self.stop()
 
     @check_bp_mode
@@ -99,9 +93,7 @@ class I2C(AbstractMode):
         takes data as a single value or a list of values and writes them to the device.
         """
         self.start()
-        self.send(address << 1)
-        self.send(register)
-        self.send(data)
+        self.send([address << 1, register, data])
         self.stop()
 
     @check_bp_mode
@@ -111,8 +103,7 @@ class I2C(AbstractMode):
         This takes the 7 bit address and appends a 1 (read bit) to the address.
         """
         self.start()
-        self.send(address << 1)
-        self.send(register)
+        self.send([address << 1, register])
         self.start()
         self.send(address << 1 | 0x01)
         response = self.read_byte()
