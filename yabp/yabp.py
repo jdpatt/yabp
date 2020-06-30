@@ -172,9 +172,12 @@ class BusPirate:
 
 
 def get_serial_port() -> str:
-    """Find an USB to Serial comport."""
+    """Find a virtual COM port that looks like a bus pirate.
+
+    The bus pirate v3 has a vendor id of 0403 and the documentation of the v4 lists 04D8 as the id.
+    """
     potential_ports = serial.tools.list_ports.comports(include_links=True)
     for port in potential_ports:
-        if "usbserial" in port.device:
+        if any(vid in port.hwid for vid in ["0403", "04D8"]):
             return port.device
     raise ConnectionError("Failed to find Bus Pirate")
