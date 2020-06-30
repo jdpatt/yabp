@@ -1,5 +1,5 @@
-from enum import IntEnum
 import logging
+from enum import IntEnum
 
 import yabp
 
@@ -61,13 +61,17 @@ class MCP23017:
         if pin not in self.PORTA_PINS or pin not in self.PORTB_PINS:
             raise ValueError(f"Invalid pin: {pin} for MCP23017.")
 
-    def _write_register(self, register: str, value: int):
+    def _write_register(self, register: str):
         """Write out over I2C to the device."""
-        self.i2c.write_register(self.address, MCP23017_MEMORYMAP[register], value)
+        self.i2c.write_register(
+            self.address, MCP23017_MEMORYMAP[register], self.registers[register]
+        )
 
-    def _read_register(self, register: str, value: int):
+    def _read_register(self, register: str):
         """Read register from the device."""
-        return self.i2c.read_register(self.address, MCP23017_MEMORYMAP[register])
+        self.registers[register] = self.i2c.read_register(
+            self.address, MCP23017_MEMORYMAP[register]
+        )
 
 
 if __name__ == "__main__":
