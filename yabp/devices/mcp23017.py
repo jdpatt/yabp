@@ -133,7 +133,7 @@ class MCP23017:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    with yabp.BusPirate("COM7") as bp:
+    with yabp.BusPirate() as bp:
         gpio_expander = MCP23017(0x20, bp)
         gpio_expander.set_all_direction(gpio_expander.DIRECTION.OUTPUT)
         time.sleep(2)
