@@ -2,6 +2,8 @@
 
 Yet Another Bus Pirate Library
 
+Latest Version: *0.1.0*
+
 ![yabp](https://github.com/jdpatt/yabp/workflows/yabp/badge.svg)
 
 A [Bus Pirate](http://dangerousprototypes.com/docs/Bus_Pirate) is a handy little debug tool.  Its
