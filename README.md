@@ -39,14 +39,14 @@ if __name__ == "__main__":
 
     # Traditional usage:
     try:
-        bp = yabp.I2C("COM3", 115200)
-        bp.write_register(0x23, 0x01, 0xFF)
+        bp = yabp.I2C("COM3", 115200)  # Specified the com port and baud rate.
+        bp.write_register(address=0x23, register=0x01, data=0xFF)
         bp.close()
     except ConnectionError as error:
         logging.error(error)
         raise
 
-    # As a context manager:
-    with yabp.I2C() as bp:
+    # Or as a context manager:
+    with yabp.I2C() as bp:  # Let the library find the correct serial port.
         bp.write_register(0x23, 0x01, 0xFF)
 ```
