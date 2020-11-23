@@ -1,24 +1,26 @@
 """SPI Mode of the Bus Pirate."""
 import logging
+from typing import Union
 
-from yabp.decorators import check_bp_mode
-from yabp.enums import MODES
-from yabp.modes.abstract_mode import AbstractMode
+import serial
 
-log = logging.getLogger("yabp")
+from yabp.modes.abstract_mode import AbstractBusPirateMode
+
+log = logging.getLogger("yabp.spi")
 
 
-class SPI(AbstractMode):
+class SPI(AbstractBusPirateMode):
     """SPI Mode of the Bus Pirate."""
 
-    def __init__(self, bp):
-        super().__init__(bp)
-        self.required_mode = MODES.SPI
+    def __init__(
+        self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
+    ):
+        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
+        self._set_mode(b"SPI1")
 
         # Pin output HiZ, CKP Idle = Low, CKE Edge = Active to Idle (1), Sample Middle
         self._config_spi = 0x82
 
-    @check_bp_mode
     def set_speed(self, speed: int = 0) -> None:
         """Set the clock rate for SPI.
 
@@ -36,7 +38,6 @@ class SPI(AbstractMode):
             raise ValueError(f"{speed} is not a valid baud rate setting.")
         self.command(bytes([0x60 | speed]))
 
-    @check_bp_mode
     def output_state(self, high: bool = False) -> None:
         """Set the pin output to HiZ or 3.3V."""
         if high:
@@ -47,7 +48,6 @@ class SPI(AbstractMode):
             log.info("Pin Output to HiZ")
         self._write_config()
 
-    @check_bp_mode
     def set_chip_select(self, high: bool = True) -> None:
         """Set the chip select pin either high (True) or low (False)."""
         if high:
@@ -58,7 +58,6 @@ class SPI(AbstractMode):
             log.info("Chip Select Low.")
         self.is_successful()
 
-    @check_bp_mode
     def clock_idle_polarity(self, idle_low: bool = True) -> None:
         """Update the clock to idle high or low."""
         if idle_low:
@@ -69,7 +68,6 @@ class SPI(AbstractMode):
             log.info("Clock Idle Low")
         self._write_config()
 
-    @check_bp_mode
     def clock_edge_select(self, active_to_idle: bool = True) -> None:
         """Update the clock to idle high or low."""
         if active_to_idle:
@@ -80,7 +78,6 @@ class SPI(AbstractMode):
             log.info("Data transitions on idle to active clock state")
         self._write_config()
 
-    @check_bp_mode
     def sample_time(self, end: bool = False) -> None:
         """Update the clock to idle high or low."""
         if end:

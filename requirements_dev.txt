@@ -1,6 +1,6 @@
 # Tools
 black
-Click==7.0
+bump2version
 isort
 pre-commit
 pylint

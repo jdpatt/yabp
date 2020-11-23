@@ -22,7 +22,7 @@ copyright = "2020, David Patterson"
 author = "David Patterson"
 
 # The full version, including alpha/beta/rc tags
-release = "0.1.0"
+release = "0.2.0"
 
 
 # -- General configuration ---------------------------------------------------

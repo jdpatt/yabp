@@ -2,7 +2,7 @@
 
 Yet Another Bus Pirate Library
 
-Latest Version: *0.1.0*
+Latest Version: *0.2.0*
 
 ![yabp](https://github.com/jdpatt/yabp/workflows/yabp/badge.svg)
 
@@ -41,22 +41,14 @@ if __name__ == "__main__":
 
     # Traditional usage:
     try:
-        bp = yabp.BusPirate("COM3", 115200)
-        bp.i2c.write_register(0x23, 0x01, 0xFF)
+        bp = yabp.I2C("COM3", 115200)
+        bp.write_register(0x23, 0x01, 0xFF)
         bp.close()
     except ConnectionError as error:
         logging.error(error)
         raise
 
     # As a context manager:
-    with yabp.BusPirate() as bp:
-        bp.i2c.write_register(0x23, 0x01, 0xFF)
+    with yabp.I2C() as bp:
+        bp.write_register(0x23, 0x01, 0xFF)
 ```
-
-## I2C Commands
-
-- `bp.i2c.set_speed(speed: int)`
-- `bp.i2c.write(address: int, data: Union[int, List])`
-- `bp.i2c.read(address: int, number_of_bytes: int)`
-- `bp.i2c.write_register(address: int, register: int, data: int)`
-- `bp.i2c.read_register(address: int, register: int)`

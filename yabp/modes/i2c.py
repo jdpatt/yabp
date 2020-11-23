@@ -2,41 +2,38 @@
 import logging
 from typing import List, Union
 
-from yabp.decorators import check_bp_mode
-from yabp.enums import MODES
-from yabp.modes.abstract_mode import AbstractMode
+import serial
 
-log = logging.getLogger("yabp")
+from yabp.modes.abstract_mode import AbstractBusPirateMode
+
+log = logging.getLogger("yabp.i2c")
 
 
-class I2C(AbstractMode):
+class I2C(AbstractBusPirateMode):
     """I2C Mode of the Bus Pirate."""
 
-    def __init__(self, bp):
-        super().__init__(bp)
-        self.required_mode = MODES.I2C
+    def __init__(
+        self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
+    ):
+        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
+        self._set_mode(b"I2C1")
 
-    @check_bp_mode
     def start(self) -> None:
         """Send a start bit."""
         self.command(b"\x02")
 
-    @check_bp_mode
     def stop(self) -> None:
         """Send a start bit."""
         self.command(b"\x03")
 
-    @check_bp_mode
     def ack(self) -> None:
         """Acknowledge a byte."""
         self.command(b"\x06")
 
-    @check_bp_mode
     def nack(self) -> None:
         """No Acknowledge a byte."""
         self.command(b"\x07")
 
-    @check_bp_mode
     def read_byte(self) -> bytes:
         """Read and returns a single byte.
 
@@ -45,7 +42,6 @@ class I2C(AbstractMode):
         self.serial.write(b"\x04")
         return self.serial.read(1)
 
-    @check_bp_mode
     def set_speed(self, speed: int = 2) -> None:
         """Set the I2C Bus rate.
 
@@ -55,7 +51,6 @@ class I2C(AbstractMode):
             raise ValueError(f"{speed} is not a valid i2c speed setting.")
         self.command(bytes([0x60 | speed]))
 
-    @check_bp_mode
     def write(self, address: int, data: Union[int, List]) -> None:
         """Write to an I2C device.
 
@@ -67,7 +62,6 @@ class I2C(AbstractMode):
         self.send(data)
         self.stop()
 
-    @check_bp_mode
     def read(self, address: int, number_of_bytes: int) -> str:
         """Read from an I2C device.
 
@@ -85,7 +79,6 @@ class I2C(AbstractMode):
         self.stop()
         return response.decode()
 
-    @check_bp_mode
     def write_register(self, address: int, register: int, data: int) -> None:
         """Write to an I2C device's register.
 
@@ -96,7 +89,6 @@ class I2C(AbstractMode):
         self.send([address << 1, register, data])
         self.stop()
 
-    @check_bp_mode
     def read_register(self, address: int, register: int) -> str:
         """Read from an I2C device's register.
 

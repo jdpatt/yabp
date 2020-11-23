@@ -3,19 +3,96 @@ import logging
 from abc import ABC
 from typing import List, Union
 
-from yabp.decorators import check_bp_mode
+import serial
+import serial.tools.list_ports
+
 from yabp.exceptions import CommandError
 
 log = logging.getLogger("yabp")
 
 
-class AbstractMode(ABC):
+class AbstractBusPirateMode(ABC):
     """Base Mode for any of the Bus Pirate Modes."""
 
-    def __init__(self, bp):
-        self.serial = bp.serial
-        self.bp = bp
+    _MODES = {
+        b"BBIO1": b"\x00",
+        b"SPI1": b"\x01",
+        b"I2C1": b"\x02",
+        b"ART1": b"\x03",
+        b"1W01": b"\x04",
+        b"RAW1": b"\x05",
+    }
+
+    def __init__(self):
+        self.serial = None
         self._config_peripherals = 0x40  # Voltage and Pull-ups disabled.  AUX and CS are low.
+
+    def __enter__(self):
+        """Allow using the bus pirate as a context manager.
+
+        Example:
+        -------
+        ```python
+        with I2C("COM3") as bp:
+            bp.is_alive()
+        ```
+
+        """
+        return self
+
+    def __exit__(self, *args):
+        """Clean up from using the bus pirate as a context manager."""
+        self.close()
+
+    def open(self, port, baud_rate, timeout) -> serial.Serial:
+        """Open the serial port and enter the scripting mode.
+
+        Send 0x00 to the user terminal (max.) 20 times to enter the raw binary bitbang mode.
+        The bp will response with BBIO1 when it succeeds.
+        """
+        try:
+            if not port:
+                port = get_serial_port()
+            serial_port = serial.Serial(port=port, baudrate=baud_rate, timeout=timeout)
+            log.info(f"Connected to Bus Pirate on {port}")
+        except serial.serialutil.SerialException:
+            log.error("Failed to connect to Bus Pirate.")
+            raise
+
+        serial_port.reset_input_buffer()
+        for _ in range(0, 20):
+            serial_port.write(b"\x00")
+            status = serial_port.read(5)
+            if b"BBIO" in status:
+                serial_port.reset_input_buffer()
+                return serial_port
+        raise CommandError("Failed to Reset Bus Pirate.")
+
+    def close(self) -> None:
+        """Free the serial port."""
+        self._set_mode(b"BBIO1")
+        self._reset_bus_pirate()
+        self.serial.close()
+        log.info("Closed connection to Bus Pirate.")
+
+    def _set_mode(self, mode: bytes) -> None:
+        """Change the mode of the bus pirate."""
+        self.serial.reset_input_buffer()
+        self.serial.write(self._MODES[mode])
+        returned_name = self.serial.read(len(mode))
+        self.serial.reset_input_buffer()
+        if mode != returned_name:
+            CommandError("Failed to change modes.")
+        log.debug("Current Mode - {}".format(mode.decode()))
+
+    def _reset_bus_pirate(self) -> None:
+        """Reset the Bus Pirate to the normal terminal interface.
+
+        Send 0x0F to exit raw bitbang mode and reset the Bus Pirate.  The bp will response 0x01 on
+        success.
+        """
+        self.command(b"\x0f")
+        self.serial.reset_input_buffer()
 
     def version(self) -> str:
         """Return the current version of the mode."""
@@ -60,7 +137,10 @@ class AbstractMode(ABC):
         if status != b"\x01":
             raise CommandError(f"Bus Pirate did not acknowledge command. Returned: {status}")
 
-    @check_bp_mode
+    def is_alive(self) -> bool:
+        """Return the serial port."""
+        return self.serial.is_open
+
     def pullups(self, enable=False) -> None:
         """Enable or Disable the pull-ups."""
         if enable:
@@ -71,7 +151,6 @@ class AbstractMode(ABC):
             log.info("Disabled Pull-ups")
         self._write_config()
 
-    @check_bp_mode
     def power(self, enable=False) -> None:
         """Enable or Disable the on board power supplies."""
         if enable:
@@ -82,7 +161,6 @@ class AbstractMode(ABC):
             log.info("Disabled Power Supplies")
         self._write_config()
 
-    @check_bp_mode
     def set_aux_pin(self, high=True) -> None:
         """Enable or Disable the on board power supplies."""
         if high:
@@ -93,7 +171,6 @@ class AbstractMode(ABC):
             log.info("Set Aux Pin Low (0V)")
         self._write_config()
 
-    @check_bp_mode
     def set_cs_pin(self, high=True) -> None:
         """Enable or Disable the on board power supplies."""
         if high:
@@ -112,3 +189,15 @@ class AbstractMode(ABC):
     def config_peripherals(self) -> int:
         """Return the current configuration of the peripherals register."""
         return self._config_peripherals
+
+
+def get_serial_port() -> str:
+    """Find a virtual COM port that looks like a bus pirate.
+
+    The bus pirate v3 has a vendor id of 0403 and the documentation of the v4 lists 04D8 as the id.
+    """
+    potential_ports = serial.tools.list_ports.comports(include_links=True)
+    for port in potential_ports:
+        if any(vid in port.hwid for vid in ["0403", "04D8"]):
+            return port.device
+    raise ConnectionError("Failed to find Bus Pirate")

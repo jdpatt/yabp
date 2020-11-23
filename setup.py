@@ -9,16 +9,21 @@ def readme():
 
 setup(
     name="yabp",
-    version="0.1.0",
+    version="0.2.0",
     description="Yet Another Bus Pirate",
     long_description=readme(),
     author="David Patterson",
     url="https://github.com/jdpatt/yabp",
-    packages=["yabp",],
+    packages=[
+        "yabp",
+    ],
     include_package_data=True,
     install_requires=["pyserial"],
     license="MIT",
     zip_safe=False,
     keywords="yabp",
-    classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 3.8",],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+    ],
 )

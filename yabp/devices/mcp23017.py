@@ -5,7 +5,7 @@ from enum import Enum
 
 import yabp
 
-log = logging.getLogger("yabp.devices.MCP23017")
+log = logging.getLogger("yabp.MCP23017")
 
 
 class MCP23017:
@@ -35,7 +35,7 @@ class MCP23017:
 
     def __init__(self, seven_bit_address, bus_pirate):
         self.address = seven_bit_address
-        self.i2c = bus_pirate.i2c
+        self.i2c = bus_pirate
 
         self.registers = {
             "IODIRA": 0xFF,
@@ -133,10 +133,9 @@ class MCP23017:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    with yabp.BusPirate() as bp:
+    with yabp.I2C() as bp:
         gpio_expander = MCP23017(0x20, bp)
         gpio_expander.set_all_direction(gpio_expander.DIRECTION.OUTPUT)
-        time.sleep(2)
         gpio_expander.set_level("A0", gpio_expander.LOGIC_LEVEL.HIGH)
         time.sleep(2)
         gpio_expander.set_level("A0", gpio_expander.LOGIC_LEVEL.LOW)

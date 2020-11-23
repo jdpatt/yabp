@@ -1,12 +1,11 @@
 """Yet Another Bus Pirate Libray."""
 import logging
 
-from .enums import MODES
-from .yabp import BusPirate
+from yabp.modes import I2C, SPI, UART, Base
 
 __author__ = "David Patterson"
-__version__ = "0.1.0"
-__all__ = ["MODES", "BusPirate"]
+__version__ = "0.2.0"
+__all__ = ["Base", "I2C", "SPI", "UART"]
 
 
 logging.getLogger("yabp").addHandler(logging.NullHandler())
