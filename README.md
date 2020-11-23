@@ -9,8 +9,6 @@ Latest Version: *0.2.0*
 A [Bus Pirate](http://dangerousprototypes.com/docs/Bus_Pirate) is a handy little debug tool.  Its
 firmware, command documentation and artwork are released into the public domain.  The python libraries that I could find have gone untouched for many years. This is another library built from the command documentation.
 
-This library only exposes one class `BusPirate` and an enum `MODES`.  `BusPirate` can be used for all modes and will automatically change modes as needed.  You can also explicity set the mode with `bp.set_mode(MODES.MODE_I_WANT_TO_USE)`.
-
 ## Developer Install
 
 1. `git clone https://github.com/jdpatt/yabp.git`
