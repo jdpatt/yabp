@@ -19,7 +19,6 @@ def bp_loop(mock_serial_port):
 def bus_pirate():
     """Bus Pirate Fixture to share COM port across tests."""
     try:
-        bp = yabp.Base()
+        return yabp.Base()
     except ConnectionError:
         pytest.skip("Test requires active bus pirate connection.")
-    return bp

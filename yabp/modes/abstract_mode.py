@@ -162,7 +162,7 @@ class AbstractBusPirateMode(ABC):
         self._write_config()
 
     def set_aux_pin(self, high=True) -> None:
-        """Enable or Disable the on board power supplies."""
+        """Set the aux pin high or low."""
         if high:
             self._config_peripherals |= 0x02
             log.info("Set Aux Pin High (3.3V)")
@@ -172,7 +172,7 @@ class AbstractBusPirateMode(ABC):
         self._write_config()
 
     def set_cs_pin(self, high=True) -> None:
-        """Enable or Disable the on board power supplies."""
+        """Set the cs pin high or low."""
         if high:
             self._config_peripherals |= 0x01
             log.info("Set CS Pin High (3.3V)")
