@@ -15,8 +15,7 @@ class SPI(AbstractBusPirateMode):
     def __init__(
         self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
     ):
-        super().__init__()
-        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
+        super().__init__(port, baud_rate, timeout)
         self._set_mode(b"SPI1")
 
         # Pin output HiZ, CKP Idle = Low, CKE Edge = Active to Idle (1), Sample Middle

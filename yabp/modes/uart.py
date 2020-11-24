@@ -15,8 +15,7 @@ class UART(AbstractBusPirateMode):
     def __init__(
         self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
     ):
-        super().__init__()
-        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
+        super().__init__(port, baud_rate, timeout)
         self._set_mode(b"ART1")
         self._config_uart = 0x80  # HiZ, 8/N, 1 STOP, IDLE HIGH
 

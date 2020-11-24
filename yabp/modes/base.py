@@ -15,8 +15,7 @@ class Base(AbstractBusPirateMode):
     def __init__(
         self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
     ):
-        super().__init__()
-        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
+        super().__init__(port, baud_rate, timeout)
         self._config_peripherals = 0x80  # POWER|PULLUP|AUX|MOSI|CLK|MISO|CS
         self._config_pin_direction = 0x5F  # AUX|MOSI|CLK|MISO|CS
 

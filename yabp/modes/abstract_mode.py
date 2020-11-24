@@ -23,8 +23,10 @@ class AbstractBusPirateMode(ABC):
         b"RAW1": b"\x05",
     }
 
-    def __init__(self):
-        self.serial = None
+    def __init__(
+        self, port: Union[str, None] = None, baud_rate: int = 115200, timeout: float = 0.1
+    ):
+        self.serial: serial.Serial = self.open(port, baud_rate, timeout)
         self._config_peripherals = 0x40  # Voltage and Pull-ups disabled.  AUX and CS are low.
 
     def __enter__(self):
