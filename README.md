@@ -2,7 +2,7 @@
 
 Yet Another Bus Pirate Library
 
-Latest Version: *0.2.0*
+Latest Version: *1.0.0*
 
 ![yabp](https://github.com/jdpatt/yabp/workflows/yabp/badge.svg)
 
