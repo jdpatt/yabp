@@ -2,8 +2,6 @@
 import logging
 from typing import Union
 
-import serial
-
 from yabp.modes.abstract_mode import AbstractBusPirateMode
 
 log = logging.getLogger("yabp.base")

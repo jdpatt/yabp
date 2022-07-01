@@ -2,8 +2,6 @@
 import logging
 from typing import List, Union
 
-import serial
-
 from yabp.modes.abstract_mode import AbstractBusPirateMode
 
 log = logging.getLogger("yabp.i2c")
